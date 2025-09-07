@@ -9,13 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class DocumentLoader:
-    """Load PDF documents only"""
-
     def __init__(self):
         self.supported_extensions = ['.pdf']
 
     def load_document(self, file_path: str) -> Dict[str, Any]:
-        """Load a single PDF document and return its content with metadata"""
         file_path = Path(file_path)
 
         if not file_path.exists():
@@ -43,7 +40,6 @@ class DocumentLoader:
             raise
 
     def load_documents(self, directory_path: str) -> List[Dict[str, Any]]:
-        """Load all PDF documents from a directory"""
         directory_path = Path(directory_path)
         documents = []
 
@@ -69,7 +65,6 @@ class DocumentLoader:
         return documents
 
     def _load_pdf(self, file_path: Path) -> str:
-        """Extract text from PDF file"""
         try:
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -93,7 +88,6 @@ class DocumentLoader:
             raise
 
     def _get_pdf_page_count(self, file_path: Path) -> int:
-        """Get the number of pages in a PDF"""
         try:
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -102,7 +96,6 @@ class DocumentLoader:
             return 0
 
     def validate_pdf(self, file_path: str) -> bool:
-        """Validate if a file is a readable PDF"""
         try:
             file_path = Path(file_path)
             if not file_path.exists() or file_path.suffix.lower() != '.pdf':
@@ -110,7 +103,6 @@ class DocumentLoader:
             
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
-                # Try to read first page
                 if len(pdf_reader.pages) > 0:
                     pdf_reader.pages[0].extract_text()
                 return True

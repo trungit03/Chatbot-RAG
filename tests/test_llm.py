@@ -10,22 +10,17 @@ from rag.llm import OllamaLLM
 
 
 class TestOllamaLLM(unittest.TestCase):
-
     def setUp(self):
-        """Set up test fixtures"""
-        # Mock the connection check to avoid actual HTTP calls
         with patch.object(OllamaLLM, '_check_connection'):
             self.llm = OllamaLLM()
 
     def test_build_prompt_basic(self):
-        """Test basic prompt building"""
         prompt = self.llm._build_prompt("What is AI?")
 
         self.assertIn("What is AI?", prompt)
         self.assertIn("helpful AI assistant", prompt)
 
     def test_build_prompt_with_context(self):
-        """Test prompt building with context"""
         context = ["AI is artificial intelligence.", "Machine learning is a subset of AI."]
         prompt = self.llm._build_prompt("What is AI?", context=context)
 
@@ -35,7 +30,6 @@ class TestOllamaLLM(unittest.TestCase):
         self.assertIn("Context Information:", prompt)
 
     def test_build_prompt_with_history(self):
-        """Test prompt building with chat history"""
         history = [
             {"human": "Hello", "assistant": "Hi there!"},
             {"human": "How are you?", "assistant": "I'm doing well, thank you!"}
@@ -61,8 +55,6 @@ class TestOllamaLLM(unittest.TestCase):
 
     @patch('requests.post')
     def test_generate_response_success(self, mock_post):
-        """Test successful response generation"""
-        # Mock successful API response
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"response": "AI stands for Artificial Intelligence."}
@@ -75,8 +67,6 @@ class TestOllamaLLM(unittest.TestCase):
 
     @patch('requests.post')
     def test_generate_response_error(self, mock_post):
-        """Test response generation with API error"""
-        # Mock API error
         mock_response = MagicMock()
         mock_response.status_code = 500
         mock_response.text = "Internal Server Error"
@@ -88,8 +78,6 @@ class TestOllamaLLM(unittest.TestCase):
 
     @patch('requests.post')
     def test_generate_response_timeout(self, mock_post):
-        """Test response generation with timeout"""
-        # Mock timeout
         mock_post.side_effect = Exception("Timeout")
 
         response = self.llm.generate_response("What is AI?")
@@ -98,8 +86,6 @@ class TestOllamaLLM(unittest.TestCase):
 
     @patch('requests.get')
     def test_get_available_models_success(self, mock_get):
-        """Test getting available models successfully"""
-        # Mock successful API response
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
@@ -118,8 +104,6 @@ class TestOllamaLLM(unittest.TestCase):
 
     @patch('requests.get')
     def test_get_available_models_error(self, mock_get):
-        """Test getting available models with error"""
-        # Mock API error
         mock_get.side_effect = Exception("Connection error")
 
         models = self.llm.get_available_models()
@@ -127,17 +111,14 @@ class TestOllamaLLM(unittest.TestCase):
         self.assertEqual(len(models), 0)
 
     def test_set_model(self):
-        """Test setting a new model"""
         with patch.object(self.llm, 'get_available_models', return_value=['llama2:latest', 'codellama:latest']):
             self.llm.set_model('codellama:latest')
             self.assertEqual(self.llm.model, 'codellama:latest')
 
     def test_set_invalid_model(self):
-        """Test setting an invalid model"""
         original_model = self.llm.model
         with patch.object(self.llm, 'get_available_models', return_value=['llama2:latest']):
             self.llm.set_model('invalid_model')
-            # Model should remain unchanged
             self.assertEqual(self.llm.model, original_model)
 
 

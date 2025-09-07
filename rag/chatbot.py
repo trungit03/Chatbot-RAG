@@ -15,17 +15,12 @@ logger = logging.getLogger(__name__)
 
 
 class RAGChatbot:
-    """Main RAG Chatbot class that orchestrates all components"""
-
     def __init__(self):
-        # Initialize components
         self.document_loader = DocumentLoader()
         self.text_processor = TextProcessor()
         self.embedding_manager = EmbeddingManager()
         self.retriever = VectorRetriever()
         self.llm = OllamaLLM()
-
-        # Chat state
         self.chat_history = []
         self.session_id = None
         self.is_initialized = False
@@ -33,11 +28,9 @@ class RAGChatbot:
         logger.info("RAG Chatbot initialized successfully")
 
     def load_documents(self, document_path: str) -> bool:
-        """Load and process documents into the vector database"""
         try:
             logger.info(f"Loading documents from: {document_path}")
 
-            # Load documents
             if os.path.isfile(document_path):
                 documents = [self.document_loader.load_document(document_path)]
             else:
@@ -47,7 +40,6 @@ class RAGChatbot:
                 logger.warning("No documents found to load")
                 return False
 
-            # Process documents into chunks
             logger.info("Processing documents into chunks...")
             chunks = self.text_processor.process_documents(documents)
 
@@ -55,11 +47,9 @@ class RAGChatbot:
                 logger.warning("No chunks created from documents")
                 return False
 
-            # Generate embeddings
             logger.info("Generating embeddings...")
             embedded_chunks = self.embedding_manager.embed_documents(chunks)
 
-            # Add to vector database
             logger.info("Adding documents to vector database...")
             self.retriever.add_documents(embedded_chunks)
 
@@ -72,28 +62,22 @@ class RAGChatbot:
             return False
 
     def chat(self, user_message: str, top_k: int = 5) -> str:
-        """Main chat function"""
         try:
             if not self.is_initialized:
                 return "Please load documents first before asking questions."
 
-            # Generate embedding for user query
             query_embedding = self.embedding_manager.embed_text(user_message)
 
-            # Retrieve relevant documents
             relevant_docs = self.retriever.search(query_embedding, top_k=top_k)
 
-            # Extract context from retrieved documents
             context = [doc['content'] for doc in relevant_docs]
 
-            # Generate response using LLM
             response = self.llm.generate_response(
                 prompt=user_message,
                 context=context,
                 chat_history=self.chat_history
             )
 
-            # Update chat history
             self._update_chat_history(user_message, response, relevant_docs)
 
             return response
@@ -103,22 +87,17 @@ class RAGChatbot:
             return "Sorry, I encountered an error while processing your question."
 
     def stream_chat(self, user_message: str, top_k: int = 5):
-        """Streaming chat function (generator)"""
         try:
             if not self.is_initialized:
                 yield "Please load documents first before asking questions."
                 return
 
-            # Generate embedding for user query
             query_embedding = self.embedding_manager.embed_text(user_message)
 
-            # Retrieve relevant documents
             relevant_docs = self.retriever.search(query_embedding, top_k=top_k)
 
-            # Extract context from retrieved documents
             context = [doc['content'] for doc in relevant_docs]
 
-            # Generate streaming response
             full_response = ""
             for chunk in self.llm.stream_response(
                     prompt=user_message,
@@ -128,7 +107,6 @@ class RAGChatbot:
                 full_response += chunk
                 yield chunk
 
-            # Update chat history with complete response
             self._update_chat_history(user_message, full_response, relevant_docs)
 
         except Exception as e:
@@ -137,7 +115,6 @@ class RAGChatbot:
 
     def _update_chat_history(self, user_message: str, assistant_response: str,
                              relevant_docs: List[Dict[str, Any]]):
-        """Update chat history with new exchange"""
         exchange = {
             'timestamp': datetime.now().isoformat(),
             'human': user_message,
@@ -147,17 +124,14 @@ class RAGChatbot:
 
         self.chat_history.append(exchange)
 
-        # Keep only recent history
         if len(self.chat_history) > MAX_CHAT_HISTORY:
             self.chat_history = self.chat_history[-MAX_CHAT_HISTORY:]
 
     def clear_chat_history(self):
-        """Clear current chat history"""
         self.chat_history = []
         logger.info("Chat history cleared")
 
     def save_chat_history(self, filename: str = None):
-        """Save chat history to file"""
         try:
             if not filename:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -176,7 +150,6 @@ class RAGChatbot:
             return None
 
     def load_chat_history(self, filepath: str):
-        """Load chat history from file"""
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 self.chat_history = json.load(f)
@@ -189,20 +162,17 @@ class RAGChatbot:
             return False
 
     def get_database_info(self) -> Dict[str, Any]:
-        """Get information about the current database"""
         info = self.retriever.get_collection_info()
         info['is_initialized'] = self.is_initialized
         info['chat_history_length'] = len(self.chat_history)
         return info
 
     def clear_database(self):
-        """Clear all documents from the database"""
         self.retriever.clear_collection()
         self.is_initialized = False
         logger.info("Database cleared")
 
     def get_relevant_sources(self, user_message: str, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Get relevant sources for a query without generating response"""
         try:
             if not self.is_initialized:
                 return []

@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class OllamaLLM:
-
     def __init__(self, base_url: str = OLLAMA_BASE_URL, model: str = DEFAULT_MODEL):
         self.base_url = base_url
         self.model = model
@@ -21,7 +20,6 @@ class OllamaLLM:
             response = requests.get(f"{self.base_url}/api/tags", timeout=5)
             if response.status_code == 200:
                 logger.info("Connected to Ollama server successfully")
-                # Check if model is available
                 models = response.json().get('models', [])
                 model_names = [model['name'] for model in models]
                 if not any(self.model in name for name in model_names):
@@ -34,12 +32,9 @@ class OllamaLLM:
 
     def generate_response(self, prompt: str, context: List[str] = None,
                           chat_history: List[Dict[str, str]] = None) -> str:
-        """Generate response using Ollama"""
         try:
-            # Build the full prompt
             full_prompt = self._build_prompt(prompt, context, chat_history)
 
-            # Prepare request data
             data = {
                 "model": self.model,
                 "prompt": full_prompt,
@@ -51,7 +46,6 @@ class OllamaLLM:
                 }
             }
 
-            # Make request to Ollama
             response = requests.post(
                 f"{self.base_url}/api/generate",
                 json=data,
@@ -86,10 +80,8 @@ Follow these guidelines:
 3. Be concise but comprehensive in your answers
 4. Maintain a helpful and professional tone
 5. If asked about something not in the context, explain that you can only answer based on the provided documents
-6. Always answer details
 """)
 
-        # Add context if provided
         if context:
             prompt_parts.append("\nContext Information:")
             for i, ctx in enumerate(context, 1):
@@ -97,7 +89,6 @@ Follow these guidelines:
                 prompt_parts.append(ctx)
             prompt_parts.append("\n" + "=" * 50)
 
-        # Add chat history if provided
         if chat_history:
             prompt_parts.append("\nPrevious Conversation:")
             for exchange in chat_history[-5:]:  # Last 5 exchanges
@@ -105,7 +96,6 @@ Follow these guidelines:
                 prompt_parts.append(f"Assistant: {exchange.get('assistant', '')}")
             prompt_parts.append("\n" + "=" * 50)
 
-        # Add current question
         prompt_parts.append(f"\nCurrent Question: {user_query}")
         prompt_parts.append("\nAnswer based on the context provided above:")
 
@@ -113,7 +103,6 @@ Follow these guidelines:
 
     def stream_response(self, prompt: str, context: List[str] = None,
                         chat_history: List[Dict[str, str]] = None):
-        """Generate streaming response (generator)"""
         try:
             full_prompt = self._build_prompt(prompt, context, chat_history)
 
@@ -154,7 +143,6 @@ Follow these guidelines:
             yield f"Error: {str(e)}"
 
     def get_available_models(self) -> List[str]:
-        """Get list of available models"""
         try:
             response = requests.get(f"{self.base_url}/api/tags", timeout=5)
             if response.status_code == 200:
@@ -166,7 +154,6 @@ Follow these guidelines:
             return []
 
     def set_model(self, model_name: str):
-        """Change the current model"""
         available_models = self.get_available_models()
         if any(model_name in name for name in available_models):
             self.model = model_name

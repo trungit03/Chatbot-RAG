@@ -8,15 +8,12 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingManager:
-    """Manage text embeddings using SentenceTransformers"""
-
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         self.model_name = model_name
         self.model = None
         self._load_model()
 
     def _load_model(self):
-        """Load the embedding model"""
         try:
             logger.info(f"Loading embedding model: {self.model_name}")
             self.model = SentenceTransformer(self.model_name)
@@ -26,7 +23,6 @@ class EmbeddingManager:
             raise
 
     def embed_text(self, text: str) -> List[float]:
-        """Generate embedding for a single text"""
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
 
@@ -38,7 +34,6 @@ class EmbeddingManager:
             raise
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
-        """Generate embeddings for multiple texts"""
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
 
@@ -50,18 +45,14 @@ class EmbeddingManager:
             raise
 
     def embed_documents(self, documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Add embeddings to document chunks"""
         if not documents:
             return []
 
-        # Extract text content
         texts = [doc['content'] for doc in documents]
 
-        # Generate embeddings
         logger.info(f"Generating embeddings for {len(texts)} documents")
         embeddings = self.embed_texts(texts)
 
-        # Add embeddings to documents
         for doc, embedding in zip(documents, embeddings):
             doc['embedding'] = embedding
 
@@ -71,21 +62,17 @@ class EmbeddingManager:
     def similarity_search(self, query_embedding: List[float],
                           document_embeddings: List[List[float]],
                           top_k: int = 5) -> List[int]:
-        """Find most similar documents using cosine similarity"""
         query_embedding = np.array(query_embedding)
         document_embeddings = np.array(document_embeddings)
 
-        # Calculate cosine similarity
         similarities = np.dot(document_embeddings, query_embedding) / (
                 np.linalg.norm(document_embeddings, axis=1) * np.linalg.norm(query_embedding)
         )
 
-        # Get top-k indices
         top_indices = np.argsort(similarities)[::-1][:top_k]
         return top_indices.tolist()
 
     def get_embedding_dimension(self) -> int:
-        """Get the dimension of embeddings"""
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
         return self.model.get_sentence_embedding_dimension()

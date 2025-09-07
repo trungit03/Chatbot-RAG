@@ -6,7 +6,6 @@ import logging
 from rag.chatbot import RAGChatbot
 from config import DOCUMENTS_DIR
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -34,7 +33,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Launch web interface
     if args.web:
         if args.web == "streamlit":
             import subprocess
@@ -44,17 +42,14 @@ def main():
             subprocess.run(["python", "web/gradio_app.py"])
         return
 
-    # Initialize chatbot
     chatbot = RAGChatbot()
 
-    # Clear database if requested
     if args.clear_db:
         print("Clearing vector database...")
         chatbot.clear_database()
         print("Database cleared!")
         return
 
-    # Load documents if specified
     if args.load_docs:
         print(f"Loading documents from: {args.load_docs}")
         success = chatbot.load_documents(args.load_docs)
@@ -64,7 +59,6 @@ def main():
             print("Failed to load documents!")
             return
     else:
-        # Try to load from default documents directory
         if DOCUMENTS_DIR.exists() and any(DOCUMENTS_DIR.iterdir()):
             print(f"Loading documents from default directory: {DOCUMENTS_DIR}")
             success = chatbot.load_documents(str(DOCUMENTS_DIR))
@@ -75,7 +69,6 @@ def main():
             print("Please add documents to the documents directory or specify a path with --load-docs")
             return
 
-    # Start interactive chat
     print("\n" + "=" * 50)
     print("RAG Chatbot - Interactive Mode")
     print("=" * 50)
@@ -108,7 +101,7 @@ def main():
                 continue
 
             if user_input.lower().startswith('sources '):
-                query = user_input[8:]  # Remove 'sources ' prefix
+                query = user_input[8:]  
                 sources = chatbot.get_relevant_sources(query, top_k=3)
                 print(f"\nRelevant sources for: '{query}'")
                 for i, source in enumerate(sources, 1):
@@ -122,10 +115,9 @@ def main():
 
             print("\nBot: ", end="", flush=True)
 
-            # Use streaming response for better UX
             for chunk in chatbot.stream_chat(user_input):
                 print(chunk, end="", flush=True)
-            print()  # New line after response
+            print()  
 
         except KeyboardInterrupt:
             print("\n\nGoodbye!")
