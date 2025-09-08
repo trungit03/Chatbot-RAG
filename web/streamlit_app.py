@@ -18,58 +18,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown("""
-<style>
-.main-header {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #1f77b4;
-    text-align: center;
-    margin-bottom: 1rem;
-}
-.chat-message {
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-    border-left: 4px solid #1f77b4;
-}
-.source-card {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #dee2e6;
-    margin-bottom: 0.5rem;
-}
-.metric-card {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    color: white;
-    text-align: center;
-}
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    border: 1px solid #c3e6cb;
-}
-.warning-message {
-    background-color: #fff3cd;
-    color: #856404;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    border: 1px solid #ffeaa7;
-}
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    border: 1px solid #f5c6cb;
-}
-</style>
-""", unsafe_allow_html=True)
+
 
 @st.cache_resource
 def init_chatbot():
