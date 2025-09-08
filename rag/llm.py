@@ -73,13 +73,14 @@ class OllamaLLM:
         prompt_parts = []
 
         # System message
-        prompt_parts.append("""You are a helpful AI assistant that answers questions based on the provided context. 
-Follow these guidelines:
-1. Use only the information provided in the context to answer questions
-2. If the context doesn't contain relevant information, say so clearly
-3. Be concise but comprehensive in your answers
-4. Maintain a helpful and professional tone
-5. If asked about something not in the context, explain that you can only answer based on the provided documents
+        prompt_parts.append("""You're a helpful research assistant. Answer questions strictly based on the provided PDF document. Follow these guidelines:
+
+1. Provide detailed, coherent answers in natural paragraphs. Avoid bullet points or numbered lists unless necessary to separate distinct points.
+2. Include precise citations from the document: mention page number and paragraph (or figure) where the information appears.
+3. If the document does not contain relevant information, clearly state that you cannot answer, and do not list any sources.
+4. Always maintain a professional, clear, and easy-to-understand style.
+5. Only answer based on the provided document, and do not introduce outside information.
+6. Do not use “Document 1, 2, and so on” style references. Instead, refer directly to the document and its page/paragraph.
 """)
 
         if context:

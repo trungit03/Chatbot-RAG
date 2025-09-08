@@ -90,8 +90,8 @@ class TestOllamaLLM(unittest.TestCase):
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "models": [
-                {"name": "llama2:latest"},
-                {"name": "codellama:latest"}
+                {"name": "llama3.1:8b"},
+                {"name": "codellama:7b"}
             ]
         }
         mock_get.return_value = mock_response
@@ -99,8 +99,8 @@ class TestOllamaLLM(unittest.TestCase):
         models = self.llm.get_available_models()
 
         self.assertEqual(len(models), 2)
-        self.assertIn("llama2:latest", models)
-        self.assertIn("codellama:latest", models)
+        self.assertIn("llama3.1:8b", models)
+        self.assertIn("codellama:7b", models)
 
     @patch('requests.get')
     def test_get_available_models_error(self, mock_get):
@@ -111,13 +111,13 @@ class TestOllamaLLM(unittest.TestCase):
         self.assertEqual(len(models), 0)
 
     def test_set_model(self):
-        with patch.object(self.llm, 'get_available_models', return_value=['llama2:latest', 'codellama:latest']):
-            self.llm.set_model('codellama:latest')
-            self.assertEqual(self.llm.model, 'codellama:latest')
+        with patch.object(self.llm, 'get_available_models', return_value=['llama3.1:8b', 'codellama:7b']):
+            self.llm.set_model('codellama:7b')
+            self.assertEqual(self.llm.model, 'codellama:7b')
 
     def test_set_invalid_model(self):
         original_model = self.llm.model
-        with patch.object(self.llm, 'get_available_models', return_value=['llama2:latest']):
+        with patch.object(self.llm, 'get_available_models', return_value=['llama3.1:8b']):
             self.llm.set_model('invalid_model')
             self.assertEqual(self.llm.model, original_model)
 

@@ -14,7 +14,6 @@ from config import DOCUMENTS_DIR
 
 st.set_page_config(
     page_title="RAG PDF Chatbot",
-    page_icon="📚",
     layout="wide",
     initial_sidebar_state="expanded"
 )

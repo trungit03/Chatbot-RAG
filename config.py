@@ -11,7 +11,7 @@ for dir_path in [DATA_DIR, DOCUMENTS_DIR, VECTORDB_DIR, CHAT_HISTORY_DIR]:
     dir_path.mkdir(parents=True, exist_ok=True)
 
 OLLAMA_BASE_URL = "http://localhost:11434"
-DEFAULT_MODEL = "llama3"
+DEFAULT_MODEL = "llama3.1:8b"
 TEMPERATURE = 0.7
 
 PERSIST_DIRECTORY = str(VECTORDB_DIR)
@@ -22,5 +22,5 @@ MAX_CHAT_HISTORY = 10
 SUPPORTED_EXTENSIONS = ['.pdf']
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-# EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
