@@ -18,8 +18,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
-
 @st.cache_resource
 def init_chatbot():
     return RAGChatbot()
@@ -30,7 +28,7 @@ if 'processing' not in st.session_state:
     st.session_state.processing = False
 
 def main():
-    st.markdown('RAG PDF Chatbot', unsafe_allow_html=True)
+    st.markdown('RAG PDF Chatbot')
     st.markdown("**Chat intelligently with your PDF documents!**")
     
     chatbot = init_chatbot()
