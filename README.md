@@ -13,8 +13,7 @@ A Retrieval-Augmented Generation (RAG) PDF chatbot. This application allows user
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
-cd <repository-name>
+git clone https://github.com/trungit03/Chatbot-RAG.git
 ```
 
 ### 2. Install Ollama
