@@ -30,7 +30,7 @@ if 'processing' not in st.session_state:
     st.session_state.processing = False
 
 def main():
-    st.markdown('<h1 class="main-header">RAG PDF Chatbot</h1>', unsafe_allow_html=True)
+    st.markdown('RAG PDF Chatbot', unsafe_allow_html=True)
     st.markdown("**Chat intelligently with your PDF documents!**")
     
     chatbot = init_chatbot()
