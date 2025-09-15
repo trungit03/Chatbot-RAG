@@ -39,7 +39,7 @@ class DocumentLoader:
             logger.error(f"Error loading document {file_path}: {str(e)}")
             raise
 
-    def load_documents(self, directory_path: str) -> List[Dict[str, Any]]:
+    def load_documents(self, directory_path):
         directory_path = Path(directory_path)
         documents = []
 
@@ -64,7 +64,7 @@ class DocumentLoader:
         logger.info(f"Successfully loaded {len(documents)} PDF documents")
         return documents
 
-    def _load_pdf(self, file_path: Path) -> str:
+    def _load_pdf(self, file_path):
         try:
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -87,7 +87,7 @@ class DocumentLoader:
             logger.error(f"Error reading PDF file {file_path}: {str(e)}")
             raise
 
-    def _get_pdf_page_count(self, file_path: Path) -> int:
+    def _get_pdf_page_count(self, file_path):
         try:
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -95,7 +95,7 @@ class DocumentLoader:
         except Exception:
             return 0
 
-    def validate_pdf(self, file_path: str) -> bool:
+    def validate_pdf(self, file_path):
         try:
             file_path = Path(file_path)
             if not file_path.exists() or file_path.suffix.lower() != '.pdf':

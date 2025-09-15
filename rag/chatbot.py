@@ -27,7 +27,7 @@ class RAGChatbot:
 
         logger.info("RAG Chatbot initialized successfully")
 
-    def load_documents(self, document_path: str) -> bool:
+    def load_documents(self, document_path):
         try:
             logger.info(f"Loading documents from: {document_path}")
 
@@ -61,7 +61,7 @@ class RAGChatbot:
             logger.error(f"Error loading documents: {str(e)}")
             return False
 
-    def chat(self, user_message: str, top_k: int = 5) -> str:
+    def chat(self, user_message, top_k = 5):
         try:
             if not self.is_initialized:
                 return "Please load documents first before asking questions."
@@ -86,7 +86,7 @@ class RAGChatbot:
             logger.error(f"Error in chat: {str(e)}")
             return "Sorry, I encountered an error while processing your question."
 
-    def stream_chat(self, user_message: str, top_k: int = 5):
+    def stream_chat(self, user_message, top_k = 5):
         try:
             if not self.is_initialized:
                 yield "Please load documents first before asking questions."
@@ -113,8 +113,8 @@ class RAGChatbot:
             logger.error(f"Error in streaming chat: {str(e)}")
             yield f"Error: {str(e)}"
 
-    def _update_chat_history(self, user_message: str, assistant_response: str,
-                             relevant_docs: List[Dict[str, Any]]):
+    def _update_chat_history(self, user_message, assistant_response,
+                             relevant_docs)
         exchange = {
             'timestamp': datetime.now().isoformat(),
             'human': user_message,
@@ -131,7 +131,7 @@ class RAGChatbot:
         self.chat_history = []
         logger.info("Chat history cleared")
 
-    def save_chat_history(self, filename: str = None):
+    def save_chat_history(self, filename = None):
         try:
             if not filename:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -149,7 +149,7 @@ class RAGChatbot:
             logger.error(f"Error saving chat history: {str(e)}")
             return None
 
-    def load_chat_history(self, filepath: str):
+    def load_chat_history(self, filepath):
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 self.chat_history = json.load(f)
@@ -172,7 +172,7 @@ class RAGChatbot:
         self.is_initialized = False
         logger.info("Database cleared")
 
-    def get_relevant_sources(self, user_message: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def get_relevant_sources(self, user_message, top_k = 5):
         try:
             if not self.is_initialized:
                 return []

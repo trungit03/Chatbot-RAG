@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingManager:
-    def __init__(self, model_name: str = "all-mpnet-base-v2"):
+    def __init__(self, model_name = "nomic-ai/nomic-embed-text-v1.5"):
         self.model_name = model_name
         self.model = None
         self._load_model()
@@ -16,13 +16,13 @@ class EmbeddingManager:
     def _load_model(self):
         try:
             logger.info(f"Loading embedding model: {self.model_name}")
-            self.model = SentenceTransformer(self.model_name)
+            self.model = SentenceTransformer(self.model_name, trust_remote_code=True)
             logger.info("Embedding model loaded successfully")
         except Exception as e:
             logger.error(f"Failed to load embedding model: {str(e)}")
             raise
 
-    def embed_text(self, text: str) -> List[float]:
+    def embed_text(self, text):
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
 
@@ -33,7 +33,7 @@ class EmbeddingManager:
             logger.error(f"Error generating embedding: {str(e)}")
             raise
 
-    def embed_texts(self, texts: List[str]) -> List[List[float]]:
+    def embed_texts(self, texts):
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
 
@@ -44,7 +44,7 @@ class EmbeddingManager:
             logger.error(f"Error generating embeddings: {str(e)}")
             raise
 
-    def embed_documents(self, documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def embed_documents(self, documents):
         if not documents:
             return []
 
@@ -59,9 +59,9 @@ class EmbeddingManager:
         logger.info("Embeddings added to all documents")
         return documents
 
-    def similarity_search(self, query_embedding: List[float],
-                          document_embeddings: List[List[float]],
-                          top_k: int = 5) -> List[int]:
+    def similarity_search(self, query_embedding,
+                          document_embeddings,
+                          top_k = 5):
         query_embedding = np.array(query_embedding)
         document_embeddings = np.array(document_embeddings)
 
@@ -72,7 +72,7 @@ class EmbeddingManager:
         top_indices = np.argsort(similarities)[::-1][:top_k]
         return top_indices.tolist()
 
-    def get_embedding_dimension(self) -> int:
+    def get_embedding_dimension(self):
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
         return self.model.get_sentence_embedding_dimension()

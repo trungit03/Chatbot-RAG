@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class OllamaLLM:
-    def __init__(self, base_url: str = OLLAMA_BASE_URL, model: str = DEFAULT_MODEL):
+    def __init__(self, base_url = OLLAMA_BASE_URL, model = DEFAULT_MODEL):
         self.base_url = base_url
         self.model = model
         self.temperature = TEMPERATURE
@@ -30,8 +30,7 @@ class OllamaLLM:
             logger.error(f"Cannot connect to Ollama server at {self.base_url}: {str(e)}")
             logger.info("Please ensure Ollama is running: 'ollama serve'")
 
-    def generate_response(self, prompt: str, context: List[str] = None,
-                          chat_history: List[Dict[str, str]] = None) -> str:
+    def generate_response(self, prompt, context = None, chat_history = None):
         try:
             full_prompt = self._build_prompt(prompt, context, chat_history)
 
@@ -66,8 +65,8 @@ class OllamaLLM:
             logger.error(f"Error generating response: {str(e)}")
             return "Sorry, I encountered an error while processing your request."
 
-    def _build_prompt(self, user_query: str, context: List[str] = None,
-                      chat_history: List[Dict[str, str]] = None) -> str:
+    def _build_prompt(self, user_query, context = None,
+                      chat_history = None):
 
         prompt_parts = []
 
@@ -101,8 +100,8 @@ class OllamaLLM:
 
         return "\n".join(prompt_parts)
 
-    def stream_response(self, prompt: str, context: List[str] = None,
-                        chat_history: List[Dict[str, str]] = None):
+    def stream_response(self, prompt, context = None,
+                        chat_history = None):
         try:
             full_prompt = self._build_prompt(prompt, context, chat_history)
 
@@ -142,7 +141,7 @@ class OllamaLLM:
             logger.error(f"Error in streaming response: {str(e)}")
             yield f"Error: {str(e)}"
 
-    def get_available_models(self) -> List[str]:
+    def get_available_models(self):
         try:
             response = requests.get(f"{self.base_url}/api/tags", timeout=5)
             if response.status_code == 200:
@@ -153,7 +152,7 @@ class OllamaLLM:
             logger.error(f"Error getting available models: {str(e)}")
             return []
 
-    def set_model(self, model_name: str):
+    def set_model(self, model_name):
         available_models = self.get_available_models()
         if any(model_name in name for name in available_models):
             self.model = model_name

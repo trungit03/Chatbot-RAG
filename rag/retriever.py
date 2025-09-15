@@ -8,8 +8,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class VectorRetriever:
-    def __init__(self, persist_directory: str = PERSIST_DIRECTORY,
-                 collection_name: str = COLLECTION_NAME):
+    def __init__(self, persist_directory = PERSIST_DIRECTORY,
+                 collection_name = COLLECTION_NAME):
         self.persist_directory = persist_directory
         self.collection_name = collection_name
         self.client = None
@@ -31,7 +31,7 @@ class VectorRetriever:
             logger.error(f"Failed to initialize ChromaDB: {str(e)}")
             raise
 
-    def add_documents(self, documents: List[Dict[str, Any]]):
+    def add_documents(self, documents):
         if not documents:
             logger.warning("No documents to add")
             return
@@ -68,7 +68,7 @@ class VectorRetriever:
             logger.error(f"Error adding documents to vector database: {str(e)}")
             raise
 
-    def search(self, query_embedding: List[float], top_k: int = 5) -> List[Dict[str, Any]]:
+    def search(self, query_embedding, top_k = 5):
         try:
             results = self.collection.query(
                 query_embeddings=[query_embedding],

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class TextProcessor:
-    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
+    def __init__(self, chunk_size = 1000, chunk_overlap = 200):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -18,7 +18,7 @@ class TextProcessor:
             separators=["\n\n", "\n", " ", ""]
         )
 
-    def clean_text(self, text: str) -> str:
+    def clean_text(self, text):
         text = re.sub(r'\s+', ' ', text)
 
         text = re.sub(r'[^\w\s\.\,\!\?\;\:\-\(\)]', '', text)
@@ -27,7 +27,7 @@ class TextProcessor:
 
         return text.strip()
 
-    def chunk_text(self, text: str, metadata: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+    def chunk_text(self, text, metadata = None):
         if not text or not text.strip():
             return []
 
@@ -51,7 +51,7 @@ class TextProcessor:
         logger.info(f"Created {len(processed_chunks)} chunks from text")
         return processed_chunks
 
-    def process_documents(self, documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def process_documents(self, documents):
         all_chunks = []
 
         for doc in documents:
@@ -65,7 +65,7 @@ class TextProcessor:
         logger.info(f"Total chunks created: {len(all_chunks)}")
         return all_chunks
 
-    def extract_keywords(self, text: str, max_keywords: int = 10) -> List[str]:
+    def extract_keywords(self, text, max_keywords = 10):
         stop_words = {
             'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
             'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have',
