@@ -114,7 +114,7 @@ class RAGChatbot:
             yield f"Error: {str(e)}"
 
     def _update_chat_history(self, user_message, assistant_response,
-                             relevant_docs)
+                             relevant_docs):
         exchange = {
             'timestamp': datetime.now().isoformat(),
             'human': user_message,
