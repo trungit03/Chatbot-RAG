@@ -23,5 +23,5 @@ SUPPORTED_EXTENSIONS = ['.pdf']
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 # EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-# EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
-EMBEDDING_MODEL = "nomic-ai/nomic-embed-text-v1.5"
+EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
+# EMBEDDING_MODEL = "nomic-ai/nomic-embed-text-v1.5"

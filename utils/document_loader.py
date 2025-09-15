@@ -3,14 +3,14 @@ from pathlib import Path
 from typing import List, Dict, Any
 import PyPDF2
 import logging
-
+from config import SUPPORTED_EXTENSIONS
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class DocumentLoader:
     def __init__(self):
-        self.supported_extensions = ['.pdf']
+        self.supported_extensions = SUPPORTED_EXTENSIONS
 
     def load_document(self, file_path: str) -> Dict[str, Any]:
         file_path = Path(file_path)

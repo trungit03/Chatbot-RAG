@@ -2,18 +2,18 @@ import re
 from typing import List, Dict, Any
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import logging
-
+from config import CHUNK_SIZE, CHUNK_OVERLAP
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class TextProcessor:
-    def __init__(self, chunk_size = 1000, chunk_overlap = 200):
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
+    def __init__(self):
+        self.chunk_size = CHUNK_SIZE
+        self.chunk_overlap = CHUNK_OVERLAP
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap,
+            chunk_size=CHUNK_SIZE,
+            chunk_overlap=CHUNK_OVERLAP,
             length_function=len,
             separators=["\n\n", "\n", " ", ""]
         )

@@ -2,13 +2,15 @@ from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import logging
+from config import EMBEDDING_MODEL
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class EmbeddingManager:
-    def __init__(self, model_name = "nomic-ai/nomic-embed-text-v1.5"):
+    def __init__(self):
+        model_name = EMBEDDING_MODEL.split('/')[-1] if '/' in EMBEDDING_MODEL else EMBEDDING_MODEL 
         self.model_name = model_name
         self.model = None
         self._load_model()
