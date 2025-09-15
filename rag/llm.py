@@ -68,19 +68,18 @@ class OllamaLLM:
 
     def _build_prompt(self, user_query: str, context: List[str] = None,
                       chat_history: List[Dict[str, str]] = None) -> str:
-        """Build the complete prompt with context and history"""
 
         prompt_parts = []
 
         # System message
-        prompt_parts.append("""You're a helpful research assistant. Answer questions strictly based on the provided PDF document. Follow these guidelines:
+        prompt_parts.append("""You're a helpful research assistant, who answers questions based on provided research in a clear way and easy-to-understand way. Answer questions strictly based on the provided PDF document. 
+        Follow these guidelines:
 
 1. Provide detailed, coherent answers in natural paragraphs. Avoid bullet points or numbered lists unless necessary to separate distinct points.
 2. Include precise citations from the document: mention page number and paragraph (or figure) where the information appears.
 3. If the document does not contain relevant information, clearly state that you cannot answer, and do not list any sources.
 4. Always maintain a professional, clear, and easy-to-understand style.
 5. Only answer based on the provided document, and do not introduce outside information.
-6. Do not use “Document 1, 2, and so on” style references. Instead, refer directly to the document and its page/paragraph.
 """)
 
         if context:
@@ -92,7 +91,7 @@ class OllamaLLM:
 
         if chat_history:
             prompt_parts.append("\nPrevious Conversation:")
-            for exchange in chat_history[-5:]:  # Last 5 exchanges
+            for exchange in chat_history[-5:]:  
                 prompt_parts.append(f"\nHuman: {exchange.get('human', '')}")
                 prompt_parts.append(f"Assistant: {exchange.get('assistant', '')}")
             prompt_parts.append("\n" + "=" * 50)
