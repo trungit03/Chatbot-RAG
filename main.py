@@ -17,7 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description="RAG Chatbot")
     parser.add_argument(
         "--web",
-        choices=["streamlit", "gradio"],
+        choices=["streamlit"],
         help="Launch web interface"
     )
     parser.add_argument(
@@ -34,12 +34,8 @@ def main():
     args = parser.parse_args()
 
     if args.web:
-        if args.web == "streamlit":
-            import subprocess
-            subprocess.run(["streamlit", "run", "web/streamlit_app.py"])
-        elif args.web == "gradio":
-            import subprocess
-            subprocess.run(["python", "web/gradio_app.py"])
+        import subprocess
+        subprocess.run(["streamlit", "run", "web/streamlit_app.py"])
         return
 
     chatbot = RAGChatbot()
