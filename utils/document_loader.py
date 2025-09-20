@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 import PyPDF2
 import logging
 from config import SUPPORTED_EXTENSIONS
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ class DocumentLoader:
     def __init__(self):
         self.supported_extensions = SUPPORTED_EXTENSIONS
 
-    def load_document(self, file_path: str) -> Dict[str, Any]:
+    def load_document(self, file_path):
         file_path = Path(file_path)
 
         if not file_path.exists():
@@ -48,7 +49,7 @@ class DocumentLoader:
             return documents
 
         pdf_files = list(directory_path.rglob('*.pdf'))
-        
+
         if not pdf_files:
             logger.info(f"No PDF files found in {directory_path}")
             return documents
@@ -100,7 +101,7 @@ class DocumentLoader:
             file_path = Path(file_path)
             if not file_path.exists() or file_path.suffix.lower() != '.pdf':
                 return False
-            
+
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
                 if len(pdf_reader.pages) > 0:
