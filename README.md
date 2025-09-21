@@ -70,7 +70,7 @@ ollama serve
 ### 2. Run the Application
 
 ```bash
-python3 main.py --web streamlit
+python3 main.py --web
 ```
 
 ### 3. Demo
