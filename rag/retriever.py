@@ -1,3 +1,4 @@
+# retriever.py
 import chromadb
 from chromadb.config import Settings
 from typing import List, Dict, Any, Optional
@@ -8,8 +9,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class VectorRetriever:
-    def __init__(self, persist_directory = PERSIST_DIRECTORY,
-                 collection_name = COLLECTION_NAME):
+    def __init__(self, persist_directory=PERSIST_DIRECTORY,
+                 collection_name=COLLECTION_NAME):
         self.persist_directory = persist_directory
         self.collection_name = collection_name
         self.client = None
@@ -43,14 +44,19 @@ class VectorRetriever:
             documents_text = []
 
             for i, doc in enumerate(documents):
-                doc_id = f"{doc['metadata'].get('filename', 'unknown')}_{doc['metadata'].get('chunk_id', i)}"
+                # Use global_chunk_id for unique IDs
+                doc_id = f"{doc['metadata'].get('filename', 'unknown')}_{doc['metadata'].get('global_chunk_id', i)}"
                 ids.append(doc_id)
 
                 embeddings.append(doc['embedding'])
 
                 metadata = {}
                 for key, value in doc['metadata'].items():
-                    metadata[key] = str(value)
+                    # Convert all values to string for ChromaDB compatibility
+                    if key == 'page_number' and value is not None:
+                        metadata[key] = str(value)
+                    else:
+                        metadata[key] = str(value) if value is not None else ''
                 metadatas.append(metadata)
 
                 documents_text.append(doc['content'])
@@ -68,7 +74,7 @@ class VectorRetriever:
             logger.error(f"Error adding documents to vector database: {str(e)}")
             raise
 
-    def search(self, query_embedding, top_k = 5):
+    def search(self, query_embedding, top_k=5):
         try:
             results = self.collection.query(
                 query_embeddings=[query_embedding],

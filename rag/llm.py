@@ -1,3 +1,4 @@
+# llm.py
 import requests
 import json
 from typing import List, Dict, Any, Optional
@@ -9,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class OllamaLLM:
-    def __init__(self, base_url = OLLAMA_BASE_URL, model = DEFAULT_MODEL):
+    def __init__(self, base_url=OLLAMA_BASE_URL, model=DEFAULT_MODEL):
         self.base_url = base_url
         self.model = model
         self.temperature = TEMPERATURE
@@ -30,7 +31,7 @@ class OllamaLLM:
             logger.error(f"Cannot connect to Ollama server at {self.base_url}: {str(e)}")
             logger.info("Please ensure Ollama is running: 'ollama serve'")
 
-    def generate_response(self, prompt, context = None, chat_history = None):
+    def generate_response(self, prompt, context=None, chat_history=None):
         try:
             full_prompt = self._build_prompt(prompt, context, chat_history)
 
@@ -65,28 +66,48 @@ class OllamaLLM:
             logger.error(f"Error generating response: {str(e)}")
             return "Sorry, I encountered an error while processing your request."
 
-    def _build_prompt(self, user_query, context = None,
-                      chat_history = None):
-
+    def _build_prompt(self, user_query, context=None, chat_history=None):
         prompt_parts = []
 
-        # System message
-        prompt_parts.append("""You're a helpful research assistant, who answers questions based on provided research in a clear way and easy-to-understand way. Your job is to answer questions strictly based on the provided PDF document. 
-        Follow these guidelines:
+        prompt_parts.append("""You're a helpful research assistant who answers questions based on provided research documents. 
+        Follow these guidelines STRICTLY:
 
-1. Provide detailed, coherent answers in natural paragraphs. Avoid bullet points or numbered lists unless necessary to separate distinct points.
-2. Whenever possible, include precise citations to show exactly where the information comes from. Mention the page number and the paragraph, figure, or table in the document so the reader can verify the source.
-3. If the document does not contain relevant information, clearly state that you cannot answer, and do not list any sources.
-4. Always maintain a professional, clear, and easy-to-understand style.
-5. Only answer based on the provided document, and do not introduce outside information.
+1. Provide detailed, coherent answers in natural paragraphs.
+2. ALWAYS include specific citations in the format: [Document: filename, Page: X]
+3. If the context includes section headings, chapter numbers, or reference information, cite those as well (e.g., [Document: filename, Page: X, Section: Y] or [Document: filename, Chapter: Z, Page: X]).
+4. If the information comes from a reference section, cite it as such (e.g., [Document: filename, Page: X, Reference: ...]).
+5. If the document doesn't contain relevant information, state that clearly.
+6. Maintain a professional, clear style.
+7. Only answer based on the provided documents.
+
+EXAMPLE CITATIONS:
+- [Document: research.pdf, Page: 5]
+- [Document: manual.pdf, Pages: 12, 15]
+- [Document: rep.pdf, Page: 3, Section: Introduction]
+- [Document: paper.pdf, Page: 6, Section: 1.2]
+- [Document: experiment.pdf, Page: 1, Section: A]
+- [Document: predict.pdf, Page: 4, Section: II]
 """)
 
         if context:
-            prompt_parts.append("\nContext Information:")
-            for i, ctx in enumerate(context, 1):
-                prompt_parts.append(f"\n--- Document {i} ---")
-                prompt_parts.append(ctx)
-            prompt_parts.append("\n" + "=" * 50)
+            prompt_parts.append("\n=== CONTEXT DOCUMENTS ===")
+            for i, ctx_item in enumerate(context, 1):
+                if isinstance(ctx_item, dict):
+                    content = ctx_item['content']
+                    metadata = ctx_item.get('metadata', {})
+                    filename = metadata.get('filename', 'Unknown')
+                    page_number = metadata.get('page_number', 'N/A')
+                    source_info = f" [Document: {filename}, Page: {page_number}]"
+                else:
+                    content = ctx_item
+                    source_info = ""
+                
+                prompt_parts.append(f"\n--- Document {i}{source_info} ---")
+                # Truncate long content to avoid overwhelming the prompt
+                if len(content) > 1000:
+                    content = content[:1000] + "..."
+                prompt_parts.append(content)
+            prompt_parts.append("=" * 50)
 
         if chat_history:
             prompt_parts.append("\nPrevious Conversation:")
@@ -96,12 +117,11 @@ class OllamaLLM:
             prompt_parts.append("\n" + "=" * 50)
 
         prompt_parts.append(f"\nCurrent Question: {user_query}")
-        prompt_parts.append("\nAnswer based on the context provided above:")
+        prompt_parts.append("\nAnswer based on the context provided above, with accurate citations:")
 
         return "\n".join(prompt_parts)
 
-    def stream_response(self, prompt, context = None,
-                        chat_history = None):
+    def stream_response(self, prompt, context=None, chat_history=None):
         try:
             full_prompt = self._build_prompt(prompt, context, chat_history)
 

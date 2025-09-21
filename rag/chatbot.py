@@ -1,3 +1,4 @@
+# chatbot.py
 import json
 import os
 from datetime import datetime
@@ -61,16 +62,22 @@ class RAGChatbot:
             logger.error(f"Error loading documents: {str(e)}")
             return False
 
-    def chat(self, user_message, top_k = 5):
+    def chat(self, user_message, top_k=5):
         try:
             if not self.is_initialized:
                 return "Please load documents first before asking questions."
 
             query_embedding = self.embedding_manager.embed_text(user_message)
-
             relevant_docs = self.retriever.search(query_embedding, top_k=top_k)
 
-            context = [doc['content'] for doc in relevant_docs]
+            # Prepare context with both content and metadata 
+            context = []
+            for doc in relevant_docs:
+                metadata = doc.get('metadata', {})
+                context.append({
+                    'content': doc.get('content', ''),
+                    'metadata': metadata
+                })
 
             response = self.llm.generate_response(
                 prompt=user_message,
@@ -86,17 +93,22 @@ class RAGChatbot:
             logger.error(f"Error in chat: {str(e)}")
             return "Sorry, I encountered an error while processing your question."
 
-    def stream_chat(self, user_message, top_k = 5):
+    def stream_chat(self, user_message, top_k=5):
         try:
             if not self.is_initialized:
                 yield "Please load documents first before asking questions."
                 return
 
             query_embedding = self.embedding_manager.embed_text(user_message)
-
             relevant_docs = self.retriever.search(query_embedding, top_k=top_k)
 
-            context = [doc['content'] for doc in relevant_docs]
+            # Prepare context with both content and metadata 
+            context = []
+            for doc in relevant_docs:
+                context.append({
+                    'content': doc.get('content', ''),
+                    'metadata': doc.get('metadata', {})
+                })
 
             full_response = ""
             for chunk in self.llm.stream_response(
@@ -113,13 +125,12 @@ class RAGChatbot:
             logger.error(f"Error in streaming chat: {str(e)}")
             yield f"Error: {str(e)}"
 
-    def _update_chat_history(self, user_message, assistant_response,
-                             relevant_docs):
+    def _update_chat_history(self, user_message, assistant_response, relevant_docs):
         exchange = {
             'timestamp': datetime.now().isoformat(),
             'human': user_message,
             'assistant': assistant_response,
-            'sources': [doc['metadata'] for doc in relevant_docs]
+            'sources': [doc.get('metadata', {}) for doc in relevant_docs]
         }
 
         self.chat_history.append(exchange)
@@ -131,7 +142,7 @@ class RAGChatbot:
         self.chat_history = []
         logger.info("Chat history cleared")
 
-    def save_chat_history(self, filename = None):
+    def save_chat_history(self, filename=None):
         try:
             if not filename:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -161,7 +172,7 @@ class RAGChatbot:
             logger.error(f"Error loading chat history: {str(e)}")
             return False
 
-    def get_database_info(self) -> Dict[str, Any]:
+    def get_database_info(self):
         info = self.retriever.get_collection_info()
         info['is_initialized'] = self.is_initialized
         info['chat_history_length'] = len(self.chat_history)
@@ -172,7 +183,7 @@ class RAGChatbot:
         self.is_initialized = False
         logger.info("Database cleared")
 
-    def get_relevant_sources(self, user_message, top_k = 5):
+    def get_relevant_sources(self, user_message, top_k=5):
         try:
             if not self.is_initialized:
                 return []

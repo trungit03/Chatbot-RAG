@@ -17,7 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description="RAG Chatbot")
     parser.add_argument(
         "--web",
-        choices=["streamlit"],
+        action="store_true",
         help="Launch web interface"
     )
     parser.add_argument(
