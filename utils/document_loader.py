@@ -1,3 +1,4 @@
+# document_loader.py
 import os
 from pathlib import Path
 from typing import List, Dict, Any
@@ -24,10 +25,11 @@ class DocumentLoader:
             raise ValueError(f"Unsupported file type: {extension}. Only PDF files are supported.")
 
         try:
-            content = self._load_pdf(file_path)
+            content_data = self._load_pdf(file_path)
 
             return {
-                'content': content,
+                'content': content_data['formatted_text'],
+                'pages': content_data['pages'],
                 'metadata': {
                     'filename': file_path.name,
                     'file_path': str(file_path),
@@ -49,7 +51,7 @@ class DocumentLoader:
             return documents
 
         pdf_files = list(directory_path.rglob('*.pdf'))
-
+        
         if not pdf_files:
             logger.info(f"No PDF files found in {directory_path}")
             return documents
@@ -70,19 +72,27 @@ class DocumentLoader:
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
                 text_content = []
+                page_contents = []
 
                 for page_num, page in enumerate(pdf_reader.pages):
                     try:
                         page_text = page.extract_text()
                         if page_text.strip():
                             text_content.append(f"--- Page {page_num + 1} ---\n{page_text}")
+                            page_contents.append({
+                                'page_number': page_num + 1,  
+                                'content': page_text
+                            })
                     except Exception as e:
                         logger.warning(f"Error extracting text from page {page_num + 1}: {str(e)}")
 
                 if not text_content:
                     raise ValueError("No text could be extracted from the PDF")
 
-                return '\n\n'.join(text_content)
+                return {
+                    'formatted_text': '\n\n'.join(text_content),
+                    'pages': page_contents
+                }
 
         except Exception as e:
             logger.error(f"Error reading PDF file {file_path}: {str(e)}")
@@ -101,7 +111,7 @@ class DocumentLoader:
             file_path = Path(file_path)
             if not file_path.exists() or file_path.suffix.lower() != '.pdf':
                 return False
-
+            
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
                 if len(pdf_reader.pages) > 0:
