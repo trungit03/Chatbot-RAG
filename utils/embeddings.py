@@ -61,20 +61,20 @@ class EmbeddingManager:
         logger.info("Embeddings added to all documents")
         return documents
 
-    def similarity_search(self, query_embedding,
-                          document_embeddings,
-                          top_k = 5):
-        query_embedding = np.array(query_embedding)
-        document_embeddings = np.array(document_embeddings)
-
-        similarities = np.dot(document_embeddings, query_embedding) / (
-                np.linalg.norm(document_embeddings, axis=1) * np.linalg.norm(query_embedding)
-        )
-
-        top_indices = np.argsort(similarities)[::-1][:top_k]
-        return top_indices.tolist()
-
     def get_embedding_dimension(self):
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
         return self.model.get_sentence_embedding_dimension()
+    
+    # def similarity_search(self, query_embedding,
+    #                       document_embeddings,
+    #                       top_k = 5):
+    #     query_embedding = np.array(query_embedding)
+    #     document_embeddings = np.array(document_embeddings)
+
+    #     similarities = np.dot(document_embeddings, query_embedding) / (
+    #             np.linalg.norm(document_embeddings, axis=1) * np.linalg.norm(query_embedding)
+    #     )
+
+    #     top_indices = np.argsort(similarities)[::-1][:top_k]
+    #     return top_indices.tolist()

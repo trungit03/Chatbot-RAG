@@ -59,6 +59,11 @@ class DocumentLoader:
         for file_path in pdf_files:
             try:
                 doc = self.load_document(file_path)
+
+                if not self.validate_pdf(file_path):
+                    logger.warning(f"Invalid or corrupted PDF skipped: {file_path.name}")
+                    continue
+
                 documents.append(doc)
                 logger.info(f"Loaded PDF: {file_path.name} ({doc['metadata']['page_count']} pages)")
             except Exception as e:

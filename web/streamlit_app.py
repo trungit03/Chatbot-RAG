@@ -60,34 +60,38 @@ def main():
         st.divider()
         
         st.subheader("Database Info")
-        info = chatbot.get_database_info()
-        
         col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Document", info.get('document_count', 0))
-        with col2:
-            st.metric("Chat History", info.get('chat_history_length', 0))
-        
-        if info.get('is_initialized', False):
-            st.success("Ready to chat!")
-        else:
-            st.warning("No document available!")
-        
+        doc_metric = col1.empty()
+        chat_metric = col2.empty()
+        status_placeholder = st.empty()   
+
+        def refresh_db_info():
+            info = chatbot.get_database_info()
+            doc_metric.metric("Document", info.get('document_count', 0))
+            chat_metric.metric("Chat History", info.get('chat_history_length', 0))
+
+            if info.get('is_initialized', False):
+                status_placeholder.success("Ready to chat!")
+            else:
+                status_placeholder.warning("No document available!")
+
+        refresh_db_info()
+   
         st.divider()
         
         st.subheader("Actions")
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Clear chat"):
+            if st.button("Clear chat", disabled=st.session_state.processing):
                 clear_chat_history(chatbot)
         
         with col2:
-            if st.button("Clear DB", type="secondary"):
+            if st.button("Clear DB", type="secondary", disabled=st.session_state.processing):
                 clear_database(chatbot)
         
-        if st.session_state.messages:
-            if st.button("Export Chat History"):
+        if chatbot.chat_history:
+            if st.button("Export Chat History", disabled=st.session_state.processing):
                 export_chat_history()
         
         st.divider()
@@ -172,6 +176,10 @@ def main():
             "sources": [s.get('metadata', {}) for s in sources] if sources else []
         })
 
+        refresh_db_info()
+
+        st.session_state.processing = False
+        st.rerun()
 def process_uploaded_files(uploaded_files, chatbot):
     st.session_state.processing = True
     
