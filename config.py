@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+import uuid
+from datetime import datetime
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -15,7 +17,19 @@ DEFAULT_MODEL = "llama3.1:8b"
 TEMPERATURE = 0.7
 
 PERSIST_DIRECTORY = str(VECTORDB_DIR)
-COLLECTION_NAME = "rag_documents"
+# COLLECTION_NAME = "rag_documents"
+
+def generate_collection_name(prefix="rag_collection"):
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    unique_id = str(uuid.uuid4())[:8]
+    return f"{prefix}_{timestamp}_{unique_id}"
+
+RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+ENABLE_RERANKER = True
+
+# Thêm cấu hình hybrid search
+ENABLE_HYBRID_SEARCH = True
+HYBRID_ALPHA = 0.7
 
 MAX_CHAT_HISTORY = 10
 

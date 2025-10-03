@@ -18,9 +18,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+collection_name = "rag_documents"
+
 @st.cache_resource
-def init_chatbot():
-    return RAGChatbot()
+def init_chatbot(collection_name):
+    return RAGChatbot(collection_name=collection_name)
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
@@ -31,11 +33,17 @@ def main():
     st.markdown('RAG PDF Chatbot')
     st.markdown("**Chat intelligently with your PDF documents!**")
     
-    chatbot = init_chatbot()
+    chatbot = init_chatbot(collection_name)
 
     with st.sidebar:
         st.header("Document Management")
         
+        collection_name_input = st.text_input(
+        "Collection Name", 
+        value=collection_name,
+        help="Enter a name for this document collection"
+        )
+
         with st.container():
             st.subheader("Upload PDF files")
             uploaded_files = st.file_uploader(
@@ -49,7 +57,7 @@ def main():
             with col1:
                 if st.button("Process file", disabled=st.session_state.processing):
                     if uploaded_files:
-                        process_uploaded_files(uploaded_files, chatbot)
+                        process_uploaded_files(uploaded_files, chatbot, collection_name_input)
                     else:
                         st.warning("Please select PDF file!")
             
